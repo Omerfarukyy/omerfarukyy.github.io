@@ -1,0 +1,65 @@
+---
+layout: default
+---
+
+{% assign projects = site.posts | where_exp: 'post', "post.categories contains 'Projects'" %}
+{% assign htb_boxes = site.posts | where_exp: 'post', "post.categories contains 'HTB Boxes'" %}
+{% assign htb_academy = site.posts | where_exp: 'post', "post.categories contains 'HTB Academy'" %}
+{% assign thm = site.posts | where_exp: 'post', "post.categories contains 'TryHackMe'" %}
+{% assign research = site.posts | where_exp: 'post', "post.categories contains 'Security Research'" %}
+{% assign cv_url = site.cv.html_url | default: '/cv/' %}
+
+<main class="home-hub px-xl-1">
+  <section class="home-dashboard" aria-label="Portfolio overview">
+    <div class="home-projects-stack">
+      <a class="home-area home-area--projects" href="{{ '/projects/' | relative_url }}">
+        <span class="home-area__meta">{{ projects.size }} published</span>
+        <h1>Projects</h1>
+        <p>Tools, experiments, and open-source work.</p>
+        <span class="home-area__link">Explore <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+      </a>
+
+      <aside class="home-cv-card" aria-label="Curriculum vitae">
+        <span class="eyebrow">Curriculum vitae</span>
+        <p>Experience and selected work.</p>
+        <a href="{{ cv_url | relative_url }}"><span>Read online</span><small>HTML</small></a>
+        {% if site.cv.pdf_url %}
+          <a href="{{ site.cv.pdf_url | relative_url }}"><span>Download</span><small>PDF</small></a>
+        {% endif %}
+      </aside>
+    </div>
+
+    <fieldset class="home-htb-suite">
+      <legend>HTB</legend>
+      <a class="home-area home-area--htb" href="{{ '/writeups/#htb-boxes' | relative_url }}">
+        <span class="home-area__meta">{{ htb_boxes.size }} published</span>
+        <h2>HTB Boxes</h2>
+        <p>Practical machine writeups and techniques.</p>
+        <span class="home-area__link">Read writeups <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+      </a>
+
+      <a class="home-area home-area--academy" href="{{ '/writeups/#htb-academy' | relative_url }}">
+        <span class="home-area__meta">{{ htb_academy.size }} published</span>
+        <h2>HTB Academy</h2>
+        <p>Focused notes from structured modules.</p>
+        <span class="home-area__link">View notes <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+      </a>
+    </fieldset>
+
+    <div class="home-side-grid">
+      <a class="home-area home-area--research" href="{{ '/research/' | relative_url }}">
+        <span class="home-area__meta">{{ research.size }} published</span>
+        <h2>Security Research</h2>
+        <p>Responsible disclosures and CVE notes.</p>
+        <span class="home-area__link">View research <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+      </a>
+
+      <a class="home-area home-area--thm" href="{{ '/writeups/#tryhackme' | relative_url }}">
+        <span class="home-area__meta">{{ thm.size }} published</span>
+        <h2>TryHackMe</h2>
+        <p>Additional learning notes.</p>
+        <span class="home-area__link">Browse <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+      </a>
+    </div>
+  </section>
+</main>
