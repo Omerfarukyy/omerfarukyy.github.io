@@ -2,11 +2,6 @@
 layout: page
 ---
 
-<header class="page-intro mb-4">
-  <span class="eyebrow">CHRONOLOGICAL ARCHIVE</span>
-  <p>A timeline of all published writeups, security research, tools, and technical notes.</p>
-</header>
-
 <div id="archives">
   {% for post in site.posts %}
     {% capture cur_year %}{{ post.date | date: "%Y" }}{% endcapture %}

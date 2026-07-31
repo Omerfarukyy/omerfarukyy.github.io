@@ -79,33 +79,38 @@
   (function () {
     'use strict';
 
-    document.addEventListener('DOMContentLoaded', function () {
+    function init() {
       var sidebar = document.getElementById('sidebar');
       if (!sidebar) return;
 
-      var nav   = sidebar.querySelector('nav');
+      var nav = sidebar.querySelector('nav');
+      if (!nav) return;
       var items = Array.from(nav.querySelectorAll('.nav > .nav-item'));
-      if (!nav || items.length === 0) return;
+      if (items.length === 0) return;
 
       var noMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       /* ── Create SVG overlay ─────────────────────────── */
       var NS  = 'http://www.w3.org/2000/svg';
-      var svg = document.createElementNS(NS, 'svg');
-      svg.setAttribute('class', 'nav-c-track');
-      svg.setAttribute('aria-hidden', 'true');
-      svg.style.overflow = 'visible';
+      var svg = nav.querySelector('.nav-c-track');
+      var snake;
+      if (!svg) {
+        svg = document.createElementNS(NS, 'svg');
+        svg.setAttribute('class', 'nav-c-track');
+        svg.setAttribute('aria-hidden', 'true');
+        svg.style.overflow = 'visible';
 
+        snake = document.createElementNS(NS, 'path');
+        snake.setAttribute('fill', 'none');
+        snake.setAttribute('stroke', '#e8e8e5');
+        snake.setAttribute('stroke-width', '2');
+        snake.setAttribute('stroke-linecap', 'round');
+        svg.appendChild(snake);
 
-      // Visible traveling line (the "snake")
-      var snake = document.createElementNS(NS, 'path');
-      snake.setAttribute('fill', 'none');
-      snake.setAttribute('stroke', '#e8e8e5');
-      snake.setAttribute('stroke-width', '2');
-      snake.setAttribute('stroke-linecap', 'round');
-      svg.appendChild(snake);
-
-      nav.appendChild(svg);
+        nav.appendChild(svg);
+      } else {
+        snake = svg.querySelector('path');
+      }
 
       /* ── Geometry ───────────────────────────────────── */
       var R   = 7;    // corner radius of C curves
@@ -136,75 +141,65 @@
       /* ── Build the connected C-shaped track ─────────── */
       function buildPath() {
         var navR = nav.getBoundingClientRect();
+        if (navR.width === 0 || navR.height === 0) return;
+
         segStarts = [];
         segEnds   = [];
 
         var d   = '';
         var len = 0;
         var prevYBot = 0;
-        var prevXR   = 0;
 
         items.forEach(function (item, i) {
           var link = item.querySelector('.nav-link');
+          if (!link) return;
           var rect = link.getBoundingClientRect();
 
           var linkL = rect.left - navR.left;
           var yTop  = rect.top  - navR.top + VPD;
           var yBot  = rect.bottom - navR.top - VPD;
 
-          // C coordinates: left side ON button's left edge, arms along top/bottom
-          var xL = linkL;            // left vertical side aligns with button edge
-          var xR = linkL + ARM;      // arms extend right along button borders
-          var er = Math.min(R, (yBot - yTop) / 2);  // effective radius
+          var xL = linkL;
+          var xR = linkL + ARM;
+          var er = Math.min(R, (yBot - yTop) / 2);
 
           if (i === 0) {
-            // Start at top-right of first C
             d += 'M ' + xR + ' ' + yTop;
           } else {
-            // Connector: straight line from previous C's bottom-right down
             d += ' L ' + xR + ' ' + yTop;
             len += Math.abs(yTop - prevYBot);
           }
 
-          // ── Top arm: horizontal, going left ──
           var armLen = ARM - er;
           if (armLen > 0.5) {
             d += ' L ' + (xL + er) + ' ' + yTop;
             len += armLen;
           }
 
-          // ── Top curve: quarter-circle (CCW sweep) ──
           d += ' A ' + er + ' ' + er + ' 0 0 0 ' + xL + ' ' + (yTop + er);
           len += (Math.PI / 2) * er;
 
-          // ▸ Left side starts here
           segStarts.push(len);
 
-          // ── Left side: straight down ──
           var sideLen = (yBot - er) - (yTop + er);
           if (sideLen > 0) {
             d += ' L ' + xL + ' ' + (yBot - er);
             len += sideLen;
           }
 
-          // ▸ Left side ends here
           segEnds.push(len);
 
-          // ── Bottom curve: quarter-circle (CW sweep) ──
           d += ' A ' + er + ' ' + er + ' 0 0 0 ' + (xL + er) + ' ' + yBot;
           len += (Math.PI / 2) * er;
 
-          // ── Bottom arm: horizontal, going right ──
           if (armLen > 0.5) {
             d += ' L ' + xR + ' ' + yBot;
             len += armLen;
           }
 
           prevYBot = yBot;
-          prevXR   = xR;
         });
 
-        // Apply path to snake only
         snake.setAttribute('d', d);
         pathLen = snake.getTotalLength() || len;
 
@@ -214,6 +209,7 @@
 
       /* ── Render the visible segment on the path ─────── */
       function paint() {
+        if (!pathLen) return;
         var s   = Math.min(hPos, tPos);
         var e   = Math.max(hPos, tPos);
         var seg = Math.max(e - s, 0.5);
@@ -224,7 +220,7 @@
 
       /* ── Snap instantly (no animation) ──────────────── */
       function snap(idx) {
-        if (idx < 0) return;
+        if (idx < 0 || idx >= segEnds.length) return;
         hPos = hTgt = segEnds[idx];
         tPos = tTgt = segStarts[idx];
         hVel = tVel = 0;
@@ -233,7 +229,7 @@
 
       /* ── Spring-animate to a button ─────────────────── */
       function springTo(idx) {
-        if (idx < 0) return;
+        if (idx < 0 || idx >= segEnds.length) return;
         hTgt = segEnds[idx];
         tTgt = segStarts[idx];
         if (noMotion) { snap(idx); return; }
@@ -244,27 +240,24 @@
       function tick() {
         var curMid = (hPos + tPos) / 2;
         var tgtMid = (hTgt + tTgt) / 2;
-        var fwd    = tgtMid > curMid;   // moving forward (down) along path
+        var fwd    = tgtMid > curMid;
 
         var dH  = Math.abs(hTgt - hPos);
         var dTl = Math.abs(tTgt - tPos);
         var kH, kTl, dmpH, dmpTl;
 
         if (fwd) {
-          // Moving forward → head leads (it's at the end), tail trails
           kH   = dH  < NEAR ? SETTLE_K : LEAD_K;
           dmpH = dH  < NEAR ? SETTLE_D : LEAD_D;
           kTl  = dTl < NEAR ? SETTLE_K : TRAIL_K;
           dmpTl = dTl < NEAR ? SETTLE_D : TRAIL_D;
         } else {
-          // Moving backward → tail leads (it's at the start), head trails
           kTl  = dTl < NEAR ? SETTLE_K : LEAD_K;
           dmpTl = dTl < NEAR ? SETTLE_D : LEAD_D;
           kH   = dH  < NEAR ? SETTLE_K : TRAIL_K;
-          dmpH = dH  < NEAR ? SETTLE_D : TRAIL_D;
+          dmpH = dH  < NEAR ? SETTLE_D : LEAD_D;
         }
 
-        // Spring physics
         hVel += (hTgt - hPos) * kH;
         hVel *= dmpH;
         hPos += hVel;
@@ -275,7 +268,6 @@
 
         paint();
 
-        // Settled?
         var settled =
           Math.abs(hTgt - hPos) < POS_EPS &&
           Math.abs(tTgt - tPos) < POS_EPS &&
@@ -300,9 +292,13 @@
         return -1;
       }
 
-      buildPath();
-      activeIdx = findActive();
-      if (activeIdx >= 0) snap(activeIdx);
+      function refresh() {
+        buildPath();
+        activeIdx = findActive();
+        if (activeIdx >= 0) snap(activeIdx);
+      }
+
+      refresh();
 
       items.forEach(function (li, i) {
         li.addEventListener('mouseenter', function () { springTo(i); });
@@ -315,28 +311,25 @@
       nav.addEventListener('mouseleave', returnToActive);
       if (navList) navList.addEventListener('mouseleave', returnToActive);
 
-      // Recompute on resize
       if (typeof ResizeObserver !== 'undefined') {
         new ResizeObserver(function () {
-          buildPath();
-          if (activeIdx >= 0) snap(activeIdx);
+          refresh();
         }).observe(nav);
       }
 
-      // Rebuild after fonts load (prevents stale positions)
       if (document.fonts && document.fonts.ready) {
-        document.fonts.ready.then(function () {
-          buildPath();
-          if (activeIdx >= 0) snap(activeIdx);
-        });
+        document.fonts.ready.then(refresh);
       }
 
-      // Safety rebuild after layout settles
-      setTimeout(function () {
-        buildPath();
-        if (activeIdx >= 0) snap(activeIdx);
-      }, 600);
-    });
+      window.addEventListener('load', refresh);
+      setTimeout(refresh, 600);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
   })();
   </script>
 
