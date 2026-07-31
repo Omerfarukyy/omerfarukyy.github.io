@@ -90,7 +90,6 @@
 
       var noMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      /* ── Create SVG overlay ─────────────────────────── */
       var NS  = 'http://www.w3.org/2000/svg';
       var svg = nav.querySelector('.nav-c-track');
       var snake;
@@ -112,33 +111,29 @@
         snake = svg.querySelector('path');
       }
 
-      /* ── Geometry ───────────────────────────────────── */
-      var R   = 7;    // corner radius of C curves
-      var ARM = 10;   // how far arms extend right along button edges
-      var VPD = 1;    // minimal vertical padding (track hugs button edges)
+      var R   = 7;
+      var ARM = 10;
+      var VPD = 1;
 
-      /* ── Spring tuning (slow & professional) ────────── */
-      var LEAD_K   = 0.025;   // leading-edge stiffness (slow)
-      var TRAIL_K  = 0.009;   // trailing-edge stiffness (big delay → stretch)
-      var LEAD_D   = 0.87;    // leading-edge damping
-      var TRAIL_D  = 0.83;    // trailing-edge damping (gentle overshoot)
-      var NEAR     = 70;      // px threshold to switch to settle mode
-      var SETTLE_K = 0.009;   // very soft stiffness near target (slow corners)
-      var SETTLE_D = 0.94;    // high damping near target (smooth settle)
-      var POS_EPS  = 0.4;     // settled position threshold
-      var VEL_EPS  = 0.05;    // settled velocity threshold
+      var LEAD_K   = 0.025;
+      var TRAIL_K  = 0.009;
+      var LEAD_D   = 0.87;
+      var TRAIL_D  = 0.83;
+      var NEAR     = 70;
+      var SETTLE_K = 0.009;
+      var SETTLE_D = 0.94;
+      var POS_EPS  = 0.4;
+      var VEL_EPS  = 0.05;
 
-      /* ── State ──────────────────────────────────────── */
       var pathLen   = 0;
-      var segStarts = [];   // path-length position: start of left-side per button
-      var segEnds   = [];   // path-length position: end of left-side per button
-      var hPos = 0, tPos = 0;         // current head / tail position on path
-      var hTgt = 0, tTgt = 0;         // target head / tail
-      var hVel = 0, tVel = 0;         // velocities
+      var segStarts = [];
+      var segEnds   = [];
+      var hPos = 0, tPos = 0;
+      var hTgt = 0, tTgt = 0;
+      var hVel = 0, tVel = 0;
       var raf  = 0;
       var activeIdx = -1;
 
-      /* ── Build the connected C-shaped track ─────────── */
       function buildPath() {
         var navR = nav.getBoundingClientRect();
         if (navR.width === 0 || navR.height === 0) return;
@@ -207,7 +202,6 @@
         svg.setAttribute('height', navR.height);
       }
 
-      /* ── Render the visible segment on the path ─────── */
       function paint() {
         if (!pathLen) return;
         var s   = Math.min(hPos, tPos);
@@ -218,7 +212,6 @@
         snake.style.strokeDashoffset = (-s) + '';
       }
 
-      /* ── Snap instantly (no animation) ──────────────── */
       function snap(idx) {
         if (idx < 0 || idx >= segEnds.length) return;
         hPos = hTgt = segEnds[idx];
@@ -227,7 +220,6 @@
         paint();
       }
 
-      /* ── Spring-animate to a button ─────────────────── */
       function springTo(idx) {
         if (idx < 0 || idx >= segEnds.length) return;
         hTgt = segEnds[idx];
@@ -236,7 +228,6 @@
         if (!raf) raf = requestAnimationFrame(tick);
       }
 
-      /* ── Animation loop (dual-edge spring) ──────────── */
       function tick() {
         var curMid = (hPos + tPos) / 2;
         var tgtMid = (hTgt + tTgt) / 2;
@@ -284,7 +275,6 @@
         }
       }
 
-      /* ── Init + events ──────────────────────────────── */
       function findActive() {
         for (var i = 0; i < items.length; i++) {
           if (items[i].classList.contains('active')) return i;
