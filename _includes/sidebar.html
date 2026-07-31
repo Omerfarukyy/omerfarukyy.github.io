@@ -66,9 +66,278 @@
         {% else %}
           {% assign url = entry.url %}
       {% endcase %}
+      {% if entry.type == 'rss' and url %}
+        <span class="icon-border"></span>
+      {% endif %}
       {% if url %}
         <a href="{{ url }}" aria-label="{{ entry.type }}"{% unless entry.noblank %} target="_blank" rel="noopener noreferrer"{% endunless %}><i class="{{ entry.icon }}"></i></a>
       {% endif %}
     {% endfor %}
   </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+
+      var nav   = sidebar.querySelector('nav');
+      var items = Array.from(nav.querySelectorAll('.nav > .nav-item'));
+      if (!nav || items.length === 0) return;
+
+      var noMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      /* ── Create SVG overlay ─────────────────────────── */
+      var NS  = 'http://www.w3.org/2000/svg';
+      var svg = document.createElementNS(NS, 'svg');
+      svg.setAttribute('class', 'nav-c-track');
+      svg.setAttribute('aria-hidden', 'true');
+      svg.style.overflow = 'visible';
+
+
+      // Visible traveling line (the "snake")
+      var snake = document.createElementNS(NS, 'path');
+      snake.setAttribute('fill', 'none');
+      snake.setAttribute('stroke', '#e8e8e5');
+      snake.setAttribute('stroke-width', '2');
+      snake.setAttribute('stroke-linecap', 'round');
+      svg.appendChild(snake);
+
+      nav.appendChild(svg);
+
+      /* ── Geometry ───────────────────────────────────── */
+      var R   = 7;    // corner radius of C curves
+      var ARM = 10;   // how far arms extend right along button edges
+      var VPD = 1;    // minimal vertical padding (track hugs button edges)
+
+      /* ── Spring tuning (slow & professional) ────────── */
+      var LEAD_K   = 0.025;   // leading-edge stiffness (slow)
+      var TRAIL_K  = 0.009;   // trailing-edge stiffness (big delay → stretch)
+      var LEAD_D   = 0.87;    // leading-edge damping
+      var TRAIL_D  = 0.83;    // trailing-edge damping (gentle overshoot)
+      var NEAR     = 70;      // px threshold to switch to settle mode
+      var SETTLE_K = 0.009;   // very soft stiffness near target (slow corners)
+      var SETTLE_D = 0.94;    // high damping near target (smooth settle)
+      var POS_EPS  = 0.4;     // settled position threshold
+      var VEL_EPS  = 0.05;    // settled velocity threshold
+
+      /* ── State ──────────────────────────────────────── */
+      var pathLen   = 0;
+      var segStarts = [];   // path-length position: start of left-side per button
+      var segEnds   = [];   // path-length position: end of left-side per button
+      var hPos = 0, tPos = 0;         // current head / tail position on path
+      var hTgt = 0, tTgt = 0;         // target head / tail
+      var hVel = 0, tVel = 0;         // velocities
+      var raf  = 0;
+      var activeIdx = -1;
+
+      /* ── Build the connected C-shaped track ─────────── */
+      function buildPath() {
+        var navR = nav.getBoundingClientRect();
+        segStarts = [];
+        segEnds   = [];
+
+        var d   = '';
+        var len = 0;
+        var prevYBot = 0;
+        var prevXR   = 0;
+
+        items.forEach(function (item, i) {
+          var link = item.querySelector('.nav-link');
+          var rect = link.getBoundingClientRect();
+
+          var linkL = rect.left - navR.left;
+          var yTop  = rect.top  - navR.top + VPD;
+          var yBot  = rect.bottom - navR.top - VPD;
+
+          // C coordinates: left side ON button's left edge, arms along top/bottom
+          var xL = linkL;            // left vertical side aligns with button edge
+          var xR = linkL + ARM;      // arms extend right along button borders
+          var er = Math.min(R, (yBot - yTop) / 2);  // effective radius
+
+          if (i === 0) {
+            // Start at top-right of first C
+            d += 'M ' + xR + ' ' + yTop;
+          } else {
+            // Connector: straight line from previous C's bottom-right down
+            d += ' L ' + xR + ' ' + yTop;
+            len += Math.abs(yTop - prevYBot);
+          }
+
+          // ── Top arm: horizontal, going left ──
+          var armLen = ARM - er;
+          if (armLen > 0.5) {
+            d += ' L ' + (xL + er) + ' ' + yTop;
+            len += armLen;
+          }
+
+          // ── Top curve: quarter-circle (CCW sweep) ──
+          d += ' A ' + er + ' ' + er + ' 0 0 0 ' + xL + ' ' + (yTop + er);
+          len += (Math.PI / 2) * er;
+
+          // ▸ Left side starts here
+          segStarts.push(len);
+
+          // ── Left side: straight down ──
+          var sideLen = (yBot - er) - (yTop + er);
+          if (sideLen > 0) {
+            d += ' L ' + xL + ' ' + (yBot - er);
+            len += sideLen;
+          }
+
+          // ▸ Left side ends here
+          segEnds.push(len);
+
+          // ── Bottom curve: quarter-circle (CW sweep) ──
+          d += ' A ' + er + ' ' + er + ' 0 0 0 ' + (xL + er) + ' ' + yBot;
+          len += (Math.PI / 2) * er;
+
+          // ── Bottom arm: horizontal, going right ──
+          if (armLen > 0.5) {
+            d += ' L ' + xR + ' ' + yBot;
+            len += armLen;
+          }
+
+          prevYBot = yBot;
+          prevXR   = xR;
+        });
+
+        // Apply path to snake only
+        snake.setAttribute('d', d);
+        pathLen = snake.getTotalLength() || len;
+
+        svg.setAttribute('width',  navR.width);
+        svg.setAttribute('height', navR.height);
+      }
+
+      /* ── Render the visible segment on the path ─────── */
+      function paint() {
+        var s   = Math.min(hPos, tPos);
+        var e   = Math.max(hPos, tPos);
+        var seg = Math.max(e - s, 0.5);
+
+        snake.style.strokeDasharray  = seg + ' ' + (pathLen * 2);
+        snake.style.strokeDashoffset = (-s) + '';
+      }
+
+      /* ── Snap instantly (no animation) ──────────────── */
+      function snap(idx) {
+        if (idx < 0) return;
+        hPos = hTgt = segEnds[idx];
+        tPos = tTgt = segStarts[idx];
+        hVel = tVel = 0;
+        paint();
+      }
+
+      /* ── Spring-animate to a button ─────────────────── */
+      function springTo(idx) {
+        if (idx < 0) return;
+        hTgt = segEnds[idx];
+        tTgt = segStarts[idx];
+        if (noMotion) { snap(idx); return; }
+        if (!raf) raf = requestAnimationFrame(tick);
+      }
+
+      /* ── Animation loop (dual-edge spring) ──────────── */
+      function tick() {
+        var curMid = (hPos + tPos) / 2;
+        var tgtMid = (hTgt + tTgt) / 2;
+        var fwd    = tgtMid > curMid;   // moving forward (down) along path
+
+        var dH  = Math.abs(hTgt - hPos);
+        var dTl = Math.abs(tTgt - tPos);
+        var kH, kTl, dmpH, dmpTl;
+
+        if (fwd) {
+          // Moving forward → head leads (it's at the end), tail trails
+          kH   = dH  < NEAR ? SETTLE_K : LEAD_K;
+          dmpH = dH  < NEAR ? SETTLE_D : LEAD_D;
+          kTl  = dTl < NEAR ? SETTLE_K : TRAIL_K;
+          dmpTl = dTl < NEAR ? SETTLE_D : TRAIL_D;
+        } else {
+          // Moving backward → tail leads (it's at the start), head trails
+          kTl  = dTl < NEAR ? SETTLE_K : LEAD_K;
+          dmpTl = dTl < NEAR ? SETTLE_D : LEAD_D;
+          kH   = dH  < NEAR ? SETTLE_K : TRAIL_K;
+          dmpH = dH  < NEAR ? SETTLE_D : TRAIL_D;
+        }
+
+        // Spring physics
+        hVel += (hTgt - hPos) * kH;
+        hVel *= dmpH;
+        hPos += hVel;
+
+        tVel += (tTgt - tPos) * kTl;
+        tVel *= dmpTl;
+        tPos += tVel;
+
+        paint();
+
+        // Settled?
+        var settled =
+          Math.abs(hTgt - hPos) < POS_EPS &&
+          Math.abs(tTgt - tPos) < POS_EPS &&
+          Math.abs(hVel) < VEL_EPS &&
+          Math.abs(tVel) < VEL_EPS;
+
+        if (settled) {
+          hPos = hTgt; tPos = tTgt;
+          hVel = tVel = 0;
+          paint();
+          raf = 0;
+        } else {
+          raf = requestAnimationFrame(tick);
+        }
+      }
+
+      /* ── Init + events ──────────────────────────────── */
+      function findActive() {
+        for (var i = 0; i < items.length; i++) {
+          if (items[i].classList.contains('active')) return i;
+        }
+        return -1;
+      }
+
+      buildPath();
+      activeIdx = findActive();
+      if (activeIdx >= 0) snap(activeIdx);
+
+      items.forEach(function (li, i) {
+        li.addEventListener('mouseenter', function () { springTo(i); });
+      });
+
+      var navList = nav.querySelector('.nav');
+      function returnToActive() {
+        if (activeIdx >= 0) springTo(activeIdx);
+      }
+      nav.addEventListener('mouseleave', returnToActive);
+      if (navList) navList.addEventListener('mouseleave', returnToActive);
+
+      // Recompute on resize
+      if (typeof ResizeObserver !== 'undefined') {
+        new ResizeObserver(function () {
+          buildPath();
+          if (activeIdx >= 0) snap(activeIdx);
+        }).observe(nav);
+      }
+
+      // Rebuild after fonts load (prevents stale positions)
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(function () {
+          buildPath();
+          if (activeIdx >= 0) snap(activeIdx);
+        });
+      }
+
+      // Safety rebuild after layout settles
+      setTimeout(function () {
+        buildPath();
+        if (activeIdx >= 0) snap(activeIdx);
+      }, 600);
+    });
+  })();
+  </script>
+
 </aside>

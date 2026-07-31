@@ -1,0 +1,46 @@
+---
+layout: page
+---
+
+<header class="page-intro mb-4">
+  <span class="eyebrow">CHRONOLOGICAL ARCHIVE</span>
+  <p>A timeline of all published writeups, security research, tools, and technical notes.</p>
+</header>
+
+<div id="archives">
+  {% for post in site.posts %}
+    {% capture cur_year %}{{ post.date | date: "%Y" }}{% endcapture %}
+
+    {% if cur_year != last_year %}
+      {% unless forloop.first %}
+        </ul>
+        </div>
+      {% endunless %}
+
+      <div class="archive-year-group mb-4">
+        <div class="archive-year-header">
+          <span class="year lead d-block">{{ cur_year }}</span>
+          <div class="archive-year-line"></div>
+        </div>
+        <ul class="archive-list">
+      {% assign last_year = cur_year %}
+    {% endif %}
+
+    <li class="archive-item">
+      <span class="archive-date">{{ post.date | date: "%b %d" }}</span>
+      <span class="archive-sep" aria-hidden="true"></span>
+      <div class="archive-item__content">
+        <a href="{{ post.url | relative_url }}" class="archive-title">{{ post.title }}</a>
+        {% assign category = post.categories | first %}
+        {% if category %}
+          <span class="archive-cat archive-cat--{{ category | slugify }}">{{ category }}</span>
+        {% endif %}
+      </div>
+    </li>
+
+    {% if forloop.last %}
+        </ul>
+      </div>
+    {% endif %}
+  {% endfor %}
+</div>
