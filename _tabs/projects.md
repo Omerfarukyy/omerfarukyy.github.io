@@ -13,7 +13,7 @@ order: 1
   </header>
 
   {% if projects.size > 0 %}
-    <div class="work-grid">
+    <div class="work-grid work-grid--full">
       {% for project in projects %}
         {% include work-card.html item=project kind='project' label='Project' %}
       {% endfor %}

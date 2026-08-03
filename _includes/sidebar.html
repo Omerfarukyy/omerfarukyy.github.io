@@ -22,7 +22,19 @@
       </li>
       {% for tab in site.tabs %}
         {% unless tab.nav == false %}
-          <li class="nav-item{% if tab.url == page.url %}{{ ' active' }}{% endif %}">
+          {% assign is_tab_active = false %}
+          {% if tab.url == page.url %}
+            {% assign is_tab_active = true %}
+          {% elsif page.layout == 'post' %}
+            {% if page.categories contains 'Projects' and tab.url contains 'projects' %}
+              {% assign is_tab_active = true %}
+            {% elsif tab.url contains 'writeups' %}
+              {% unless page.categories contains 'Projects' %}
+                {% assign is_tab_active = true %}
+              {% endunless %}
+            {% endif %}
+          {% endif %}
+          <li class="nav-item{% if is_tab_active %}{{ ' active' }}{% endif %}">
             <a href="{{ tab.url | relative_url }}" class="nav-link">
               <i class="fa-fw {{ tab.icon }}"></i>
               {% capture tab_name %}{{ tab.url | split: '/' }}{% endcapture %}
@@ -92,23 +104,35 @@
 
       var NS  = 'http://www.w3.org/2000/svg';
       var svg = nav.querySelector('.nav-c-track');
-      var snake;
+      var snake, mask, maskBg;
       if (!svg) {
         svg = document.createElementNS(NS, 'svg');
         svg.setAttribute('class', 'nav-c-track');
         svg.setAttribute('aria-hidden', 'true');
         svg.style.overflow = 'visible';
 
+        var defs = document.createElementNS(NS, 'defs');
+        mask = document.createElementNS(NS, 'mask');
+        mask.setAttribute('id', 'snake-connector-mask');
+        maskBg = document.createElementNS(NS, 'rect');
+        maskBg.setAttribute('fill', 'white');
+        mask.appendChild(maskBg);
+        defs.appendChild(mask);
+        svg.appendChild(defs);
+
         snake = document.createElementNS(NS, 'path');
         snake.setAttribute('fill', 'none');
         snake.setAttribute('stroke', '#e8e8e5');
         snake.setAttribute('stroke-width', '2');
         snake.setAttribute('stroke-linecap', 'round');
+        snake.setAttribute('mask', 'url(#snake-connector-mask)');
         svg.appendChild(snake);
 
         nav.appendChild(svg);
       } else {
         snake = svg.querySelector('path');
+        mask = svg.querySelector('mask');
+        maskBg = mask ? mask.querySelector('rect') : null;
       }
 
       var R   = 7;
@@ -144,6 +168,7 @@
         var d   = '';
         var len = 0;
         var prevYBot = 0;
+        var connectors = [];
 
         items.forEach(function (item, i) {
           var link = item.querySelector('.nav-link');
@@ -161,6 +186,10 @@
           if (i === 0) {
             d += 'M ' + xR + ' ' + yTop;
           } else {
+            var connX = xR;
+            var connY1 = prevYBot;
+            var connY2 = yTop;
+            connectors.push({ x: connX, y1: Math.min(connY1, connY2), y2: Math.max(connY1, connY2) });
             d += ' L ' + xR + ' ' + yTop;
             len += Math.abs(yTop - prevYBot);
           }
@@ -200,6 +229,22 @@
 
         svg.setAttribute('width',  navR.width);
         svg.setAttribute('height', navR.height);
+
+        if (mask) {
+          while (mask.childNodes.length > 1) mask.removeChild(mask.lastChild);
+          maskBg.setAttribute('width', navR.width);
+          maskBg.setAttribute('height', navR.height);
+          connectors.forEach(function (c) {
+            var inset = 2;
+            var r = document.createElementNS(NS, 'rect');
+            r.setAttribute('x', c.x - 4);
+            r.setAttribute('y', c.y1 + inset);
+            r.setAttribute('width', '8');
+            r.setAttribute('height', Math.max(0, (c.y2 - c.y1) - inset * 2));
+            r.setAttribute('fill', 'black');
+            mask.appendChild(r);
+          });
+        }
       }
 
       function paint() {
@@ -285,7 +330,12 @@
       function refresh() {
         buildPath();
         activeIdx = findActive();
-        if (activeIdx >= 0) snap(activeIdx);
+        if (activeIdx >= 0) {
+          snap(activeIdx);
+        } else if (snake) {
+          snake.style.opacity = '0';
+          snake.style.strokeDasharray = '0 ' + (pathLen * 2);
+        }
       }
 
       refresh();
@@ -296,7 +346,11 @@
 
       var navList = nav.querySelector('.nav');
       function returnToActive() {
-        if (activeIdx >= 0) springTo(activeIdx);
+        if (activeIdx >= 0) {
+          springTo(activeIdx);
+        } else if (snake) {
+          snake.style.opacity = '0';
+        }
       }
       nav.addEventListener('mouseleave', returnToActive);
       if (navList) navList.addEventListener('mouseleave', returnToActive);

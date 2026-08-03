@@ -1,33 +1,35 @@
 {% assign item = include.item %}
 {% assign image_path = item.image.path | default: item.image %}
-{% assign summary = item.description | default: item.excerpt | strip_html | strip_newlines | truncate: 132 %}
+{% assign summary = item.description | default: item.excerpt | strip_html | strip_newlines | truncate: 170 %}
 
 <article class="work-card work-card--{{ include.kind | default: 'default' }}">
-  <a class="work-card__content" href="{{ item.url | relative_url }}">
-    {% if item.image %}
-      <figure class="work-card__media">
-        <img src="{{ image_path | relative_url }}" alt="{{ item.image.alt | default: item.title | escape }}">
-      </figure>
-    {% else %}
-      <div class="work-card__visual" aria-hidden="true">
-        <span>{{ include.label | default: 'Research' }}</span>
+  <a class="work-card__cover-link" href="{{ item.url | relative_url }}" aria-label="{{ item.title | escape }}"></a>
+
+  {% if item.image %}
+    <figure class="work-card__media">
+      <img src="{{ image_path | relative_url }}" alt="{{ item.image.alt | default: item.title | escape }}">
+    </figure>
+  {% else %}
+    <div class="work-card__visual" aria-hidden="true">
+      <span>{{ include.label | default: 'Research' }}</span>
+    </div>
+  {% endif %}
+
+  <div class="work-card__body">
+    <span class="work-card__label">{{ include.label | default: 'Research' }}</span>
+    <h3>{{ item.title }}</h3>
+    <p>{{ summary }}</p>
+    {% if item.tags.size > 0 %}
+      <div class="work-card__tags" aria-label="Tags">
+        {% for tag in item.tags limit: 4 %}
+          <span>{{ tag }}</span>
+        {% endfor %}
       </div>
     {% endif %}
+  </div>
 
-    <div class="work-card__body">
-      <span class="work-card__label">{{ include.label | default: 'Research' }}</span>
-      <h3>{{ item.title }}</h3>
-      <p>{{ summary }}</p>
-      {% if item.tags.size > 0 %}
-        <div class="work-card__tags" aria-label="Tags">
-          {% for tag in item.tags limit: 4 %}
-            <span>{{ tag }}</span>
-          {% endfor %}
-        </div>
-      {% endif %}
-    </div>
-  </a>
   {% if item.repo_url %}
     <a class="work-card__repo" href="{{ item.repo_url }}" target="_blank" rel="noopener noreferrer">GitHub <i class="fab fa-github" aria-hidden="true"></i></a>
   {% endif %}
 </article>
+
