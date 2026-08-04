@@ -19,14 +19,15 @@ layout: default
         <span class="home-area__link">Explore <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
       </a>
 
-      <aside class="home-cv-card" aria-label="Curriculum vitae">
-        <span class="eyebrow">Curriculum vitae</span>
-        <p>Experience and selected work.</p>
-        <a href="{{ cv_url | relative_url }}"><span>Read online</span><small>HTML</small></a>
-        {% if site.cv.pdf_url %}
-          <a href="{{ site.cv.pdf_url | relative_url }}"><span>Download</span><small>PDF</small></a>
-        {% endif %}
-      </aside>
+      <a class="home-area home-cv-card" href="{{ cv_url | relative_url }}" aria-label="CV">
+        <h2>CV</h2>
+        <p>Computer Engineer experienced in TÜBİTAK R&D projects, LLM, machine learning, and blockchain development.</p>
+        <div class="cv-card-highlights">
+          <span><i class="fas fa-certificate" aria-hidden="true"></i> CompTIA Security+ · Network+ · Cisco</span>
+          <span><i class="fas fa-brain" aria-hidden="true"></i> AI / LLM · Machine Learning · Blockchain</span>
+        </div>
+        <span class="home-area__link">View CV <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+      </a>
     </div>
 
     <fieldset class="home-htb-suite">

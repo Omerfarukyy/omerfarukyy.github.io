@@ -9,10 +9,6 @@ order: 2
 {% assign thm = site.posts | where_exp: 'post', "post.categories contains 'TryHackMe'" %}
 
 <section class="portfolio-page writeups-page">
-  <header class="page-intro">
-    <span class="eyebrow">Labs and techniques</span>
-  </header>
-
   <section class="work-section work-section--primary" id="htb-boxes">
     <header class="work-section__heading">
       <div>

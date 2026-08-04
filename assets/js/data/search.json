@@ -1,0 +1,60 @@
+---
+layout: compress
+swcache: true
+---
+
+[
+  {% for post in site.posts %}
+  {% assign summary = post.description | default: post.excerpt | strip_html | strip_newlines | truncate: 140 %}
+  {% assign label = 'Article' %}
+  {% if post.categories contains 'Projects' or post.categories contains 'projects' %}
+    {% assign label = 'Project' %}
+  {% elsif post.categories contains 'Writeups' or post.categories contains 'writeups' %}
+    {% assign label = 'Writeup' %}
+  {% elsif post.categories contains 'Security Research' or post.categories contains 'research' %}
+    {% assign label = 'Research' %}
+  {% elsif post.categories.first %}
+    {% assign label = post.categories.first %}
+  {% endif %}
+
+  {% capture media_html %}
+    {% if post.image %}
+      {% assign image_path = post.image.path | default: post.image %}
+      <figure class="work-card__media"><img src="{{ image_path | relative_url }}" alt="{{ post.image.alt | default: post.title | escape }}"></figure>
+    {% else %}
+      <div class="work-card__visual" aria-hidden="true"><span>{{ label }}</span></div>
+    {% endif %}
+  {% endcapture %}
+
+  {% capture tags_html %}
+    {% if post.tags.size > 0 %}
+      <div class="work-card__tags" aria-label="Tags">
+        {% for tag in post.tags limit: 4 %}
+          <span>{{ tag }}</span>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endcapture %}
+
+  {% capture repo_html %}
+    {% if post.repo_url %}
+      <a class="work-card__repo" href="{{ post.repo_url }}" target="_blank" rel="noopener noreferrer">GitHub <i class="fab fa-github" aria-hidden="true"></i></a>
+    {% endif %}
+  {% endcapture %}
+
+  {
+    "title": {{ post.title | jsonify }},
+    "url": {{ post.url | relative_url | jsonify }},
+    "categories": {{ post.categories | join: ', ' | jsonify }},
+    "tags": {{ post.tags | join: ', ' | jsonify }},
+    "date": {{ post.date | jsonify }},
+    "label": {{ label | jsonify }},
+    "summary": {{ summary | jsonify }},
+    "media": {{ media_html | strip_newlines | jsonify }},
+    "tags_html": {{ tags_html | strip_newlines | jsonify }},
+    "repo_html": {{ repo_html | strip_newlines | jsonify }},
+    {% capture content -%}{% include post-summary.html full_text=true %}{%- endcapture -%}
+    "content": {{ content | jsonify }}
+  }{% unless forloop.last %},{% endunless %}
+  {% endfor %}
+]

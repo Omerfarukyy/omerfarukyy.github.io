@@ -26,7 +26,18 @@ layout: page
       <span class="archive-sep" aria-hidden="true"></span>
       <div class="archive-item__content">
         <a href="{{ post.url | relative_url }}" class="archive-title">{{ post.title }}</a>
-        {% assign category = post.categories | first %}
+        {% assign category = post.categories | last | default: post.categories | first %}
+        {% if post.categories contains 'HTB Boxes' %}
+          {% assign category = 'HTB Boxes' %}
+        {% elsif post.categories contains 'HTB Academy' %}
+          {% assign category = 'HTB Academy' %}
+        {% elsif post.categories contains 'TryHackMe' %}
+          {% assign category = 'TryHackMe' %}
+        {% elsif post.categories contains 'Projects' %}
+          {% assign category = 'Projects' %}
+        {% elsif post.categories contains 'Security Research' %}
+          {% assign category = 'Security Research' %}
+        {% endif %}
         {% if category %}
           <span class="archive-cat archive-cat--{{ category | slugify }}">{{ category }}</span>
         {% endif %}

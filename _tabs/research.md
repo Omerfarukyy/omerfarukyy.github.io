@@ -7,11 +7,6 @@ order: 3
 {% assign research = site.posts | where_exp: 'post', "post.categories contains 'Security Research'" %}
 
 <section class="portfolio-page">
-  <header class="page-intro">
-    <span class="eyebrow">Responsible disclosure</span>
-    <p>Public research, advisories, and proof-of-concept notes are published only after the relevant disclosure conditions are met.</p>
-  </header>
-
   {% if research.size > 0 %}
     <div class="work-grid">
       {% for post in research %}

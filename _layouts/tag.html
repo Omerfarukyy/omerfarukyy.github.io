@@ -1,0 +1,28 @@
+---
+layout: page
+---
+
+{% assign posts = page.posts | default: site.tags[page.title] | default: site.tags[page.tag] %}
+
+<div class="portfolio-page">
+  <div class="work-grid work-grid--search mb-5">
+    {% for post in posts %}
+      {% assign kind = 'default' %}
+      {% assign label = post.categories | last | default: page.title %}
+      {% if post.categories contains 'HTB Boxes' %}
+        {% assign kind = 'htb' %}
+        {% assign label = 'HTB Box' %}
+      {% elsif post.categories contains 'HTB Academy' %}
+        {% assign kind = 'academy' %}
+        {% assign label = 'HTB Academy' %}
+      {% elsif post.categories contains 'TryHackMe' %}
+        {% assign kind = 'thm' %}
+        {% assign label = 'TryHackMe' %}
+      {% elsif post.categories contains 'Projects' %}
+        {% assign kind = 'project' %}
+        {% assign label = 'Project' %}
+      {% endif %}
+      {% include work-card.html item=post kind=kind label=label %}
+    {% endfor %}
+  </div>
+</div>

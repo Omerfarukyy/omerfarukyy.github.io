@@ -122,7 +122,7 @@
 
         snake = document.createElementNS(NS, 'path');
         snake.setAttribute('fill', 'none');
-        snake.setAttribute('stroke', '#e8e8e5');
+        snake.setAttribute('stroke', 'var(--sidebar-snake-stroke, #e8e8e5)');
         snake.setAttribute('stroke-width', '2');
         snake.setAttribute('stroke-linecap', 'round');
         snake.setAttribute('mask', 'url(#snake-connector-mask)');

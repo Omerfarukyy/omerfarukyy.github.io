@@ -3,7 +3,9 @@
 {% assign summary = item.description | default: item.excerpt | strip_html | strip_newlines | truncate: 170 %}
 
 <article class="work-card work-card--{{ include.kind | default: 'default' }}">
-  <a class="work-card__cover-link" href="{{ item.url | relative_url }}" aria-label="{{ item.title | escape }}"></a>
+  {% unless include.kind == 'project' or item.categories contains 'Projects' %}
+    <a class="work-card__cover-link" href="{{ item.url | relative_url }}" aria-label="{{ item.title | escape }}"></a>
+  {% endunless %}
 
   {% if item.image %}
     <figure class="work-card__media">
@@ -28,8 +30,13 @@
     {% endif %}
   </div>
 
-  {% if item.repo_url %}
-    <a class="work-card__repo" href="{{ item.repo_url }}" target="_blank" rel="noopener noreferrer">GitHub <i class="fab fa-github" aria-hidden="true"></i></a>
+  {% if include.kind == 'project' or item.categories contains 'Projects' %}
+    <div class="work-card__actions">
+      {% if item.repo_url %}
+        <a class="work-card__btn" href="{{ item.repo_url }}" target="_blank" rel="noopener noreferrer">GitHub <i class="fab fa-github" aria-hidden="true"></i></a>
+      {% endif %}
+      <a class="work-card__btn work-card__btn--details" href="{{ item.url | relative_url }}">Details <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+    </div>
   {% endif %}
 </article>
 

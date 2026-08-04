@@ -1,0 +1,43 @@
+---
+layout: page
+---
+
+<div class="portfolio-page">
+  {% for category in site.categories %}
+    {% assign cat_name = category[0] %}
+    {% assign posts = category[1] %}
+    
+    {% if cat_name == 'Writeups' %}
+      {% continue %}
+    {% endif %}
+
+    <section class="work-section mb-5">
+      <header class="work-section__heading">
+        <div>
+          <h2>{{ cat_name }}</h2>
+        </div>
+        <span>{{ posts.size }} {% if posts.size == 1 %}item{% else %}items{% endif %}</span>
+      </header>
+      <div class="work-grid work-grid--search">
+        {% for post in posts %}
+          {% assign kind = 'default' %}
+          {% assign label = post.categories | last | default: cat_name %}
+          {% if post.categories contains 'HTB Boxes' %}
+            {% assign kind = 'htb' %}
+            {% assign label = 'HTB Box' %}
+          {% elsif post.categories contains 'HTB Academy' %}
+            {% assign kind = 'academy' %}
+            {% assign label = 'HTB Academy' %}
+          {% elsif post.categories contains 'TryHackMe' %}
+            {% assign kind = 'thm' %}
+            {% assign label = 'TryHackMe' %}
+          {% elsif post.categories contains 'Projects' %}
+            {% assign kind = 'project' %}
+            {% assign label = 'Project' %}
+          {% endif %}
+          {% include work-card.html item=post kind=kind label=label %}
+        {% endfor %}
+      </div>
+    </section>
+  {% endfor %}
+</div>

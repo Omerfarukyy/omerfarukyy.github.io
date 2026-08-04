@@ -1,0 +1,33 @@
+<!--
+  Jekyll Simple Search loader (customized for modern 4-column box grid results)
+  See: <https://github.com/christian-fei/Simple-Jekyll-Search>
+-->
+
+{% capture result_elem %}
+  <article class="work-card work-card--default work-card--search-item">
+    <a class="work-card__cover-link" href="{url}" aria-label="{title}"></a>
+    {media}
+    <div class="work-card__body">
+      <span class="work-card__label">{label}</span>
+      <h3>{title}</h3>
+      <p>{summary}</p>
+      {tags_html}
+    </div>
+    {repo_html}
+  </article>
+{% endcapture %}
+
+{% capture not_found %}<div class="search-empty-state"><i class="fas fa-search" aria-hidden="true"></i><p>{{ site.data.locales[include.lang].search.no_results }}</p></div>{% endcapture %}
+
+<script>
+  {% comment %} Note: dependent library will be loaded in `js-selector.html` {% endcomment %}
+  document.addEventListener('DOMContentLoaded', () => {
+    SimpleJekyllSearch({
+      searchInput: document.getElementById('search-input'),
+      resultsContainer: document.getElementById('search-results'),
+      json: '{{ '/assets/js/data/search.json' | relative_url }}',
+      searchResultTemplate: '{{ result_elem | strip_newlines }}',
+      noResultsText: '{{ not_found | strip_newlines }}'
+    });
+  });
+</script>

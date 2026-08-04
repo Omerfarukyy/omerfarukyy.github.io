@@ -1,0 +1,33 @@
+---
+layout: page
+---
+
+{% assign posts = page.posts | default: site.categories[page.title] | default: site.categories[page.category] %}
+
+<div class="portfolio-page category-view-more-page">
+  <div class="mb-4">
+    <a href="{{ '/writeups/' | relative_url }}" onclick="if(document.referrer.includes(window.location.host)) { history.back(); return false; }" class="action-link" aria-label="Go back">
+      <i class="fas fa-arrow-left" aria-hidden="true"></i> Go Back
+    </a>
+  </div>
+  <div class="work-grid work-grid--search mb-5">
+    {% for post in posts %}
+      {% assign kind = 'default' %}
+      {% assign label = post.categories | last | default: 'Article' %}
+      {% if post.categories contains 'HTB Boxes' %}
+        {% assign kind = 'htb' %}
+        {% assign label = 'HTB Box' %}
+      {% elsif post.categories contains 'HTB Academy' %}
+        {% assign kind = 'academy' %}
+        {% assign label = 'HTB Academy' %}
+      {% elsif post.categories contains 'TryHackMe' %}
+        {% assign kind = 'thm' %}
+        {% assign label = 'TryHackMe' %}
+      {% elsif post.categories contains 'Projects' %}
+        {% assign kind = 'project' %}
+        {% assign label = 'Project' %}
+      {% endif %}
+      {% include work-card.html item=post kind=kind label=label %}
+    {% endfor %}
+  </div>
+</div>

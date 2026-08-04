@@ -7,11 +7,6 @@ order: 1
 {% assign projects = site.posts | where_exp: 'post', "post.categories contains 'Projects'" %}
 
 <section class="portfolio-page">
-  <header class="page-intro">
-    <span class="eyebrow">Selected work</span>
-    <p>Tools, experiments, and open-source work. Each entry links to a short case study and its source when available.</p>
-  </header>
-
   {% if projects.size > 0 %}
     <div class="work-grid work-grid--full">
       {% for project in projects %}
