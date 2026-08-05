@@ -441,7 +441,7 @@
 }
 
 .work-card__media {
-  background: var(--work-card-media-bg);
+  background: transparent !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -521,18 +521,43 @@
   overflow: hidden;
 }
 
-/* Post page preview image: fit completely without cropping, with comfortable vertical spacing */
+/* Remove gray background / wrapper boxes around all post & card images */
+.work-card__media,
+.work-card__media *,
+article figure,
+article .preview-img,
+article a.popup,
+article a.img-link,
+article div:has(> img),
+article p:has(> img),
+.post-content figure,
+.post-content a.popup,
+.post-content a.img-link {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Post header preview image & content images: exact natural size if <= 580x320, capped at 580x320 max without cropping */
 article header .preview-img,
 article header div:has(> .preview-img) img,
-article header .img-link:has(> .preview-img) img {
-  max-width: 45% !important;
+article header .img-link:has(> .preview-img) img,
+#post-wrapper article img,
+.post-content img,
+article .content img,
+article p img,
+article figure img {
+  max-width: 580px !important;
+  max-height: 320px !important;
   width: auto !important;
   height: auto !important;
-  max-height: 280px !important;
   object-fit: contain !important;
-  margin: 1.5rem auto !important;
+  margin: 1.25rem auto !important;
   display: block !important;
   border-radius: 8px;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
 .work-card__tags {
@@ -895,6 +920,20 @@ body:has(.cv-page, .category-view-more-page) #tail-wrapper {
 #sidebar {
   border-right: 1px solid var(--sidebar-border-color);
   background: var(--sidebar-custom-bg) !important;
+}
+
+#avatar {
+  display: block;
+  width: 112px;
+  height: 112px;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 80%;
+  }
 }
 
 #sidebar .site-title {
@@ -1724,5 +1763,174 @@ body:has(.home-hub) #search-trigger {
       }
     }
   }
+}
+
+/* Right Panel Table of Contents (Contents tab below Trending Tags) */
+
+:root, [data-bs-theme=dark], [data-bs-theme=light] {
+  --toc-highlight: #ffffff !important;
+}
+
+#toc-wrapper {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: sticky !important;
+  top: 4.5rem !important;
+  max-height: none !important;
+  height: auto !important;
+  overflow: visible !important;
+  z-index: 10 !important;
+  padding-left: 0.5rem !important;
+  border-left: none !important;
+
+  > * {
+    border-left: none !important;
+  }
+
+  /* Kill Chirpy default gradients and borders that cause overlapping */
+  &::before, &::after, .toc-border-cover {
+    display: none !important;
+    height: 0 !important;
+    width: 0 !important;
+    content: none !important;
+  }
+}
+
+#toc-wrapper h2.panel-heading {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  font-family: var(--font-family-monospace, "Source Sans Pro", sans-serif) !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  color: var(--portfolio-muted, #94a3b8) !important;
+  margin-bottom: 0.85rem !important;
+  padding-left: 0.2rem !important;
+  border: none !important;
+}
+
+/* Single scrollbar on nav#toc ONLY — no nested scrollbars */
+nav#toc,
+#toc-popup-content {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  max-height: calc(100vh - 160px) !important;
+  min-height: 40px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding-right: 0.5rem !important;
+  padding-left: 0.1rem !important;
+  box-sizing: border-box !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(255, 255, 255, 0.75) transparent !important;
+
+  &::-webkit-scrollbar {
+    width: 5px !important;
+  }
+  &::-webkit-scrollbar-button {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent !important;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.75) !important;
+    border-radius: 6px !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: #ffffff !important;
+  }
+}
+
+/* TOC structural lists — zero indent across all possible tag and class combinations under #toc and #toc-wrapper */
+.toc-list,
+#toc ul, #toc ul ul, #toc ul li, #toc li, #toc .toc-list, #toc .toc-list .toc-list, #toc .toc-list-item, #toc .toc-list-item ul,
+#toc-wrapper ul, #toc-wrapper ul ul, #toc-wrapper ul li, #toc-wrapper li, #toc-wrapper .toc-list, #toc-wrapper .toc-list .toc-list, #toc-wrapper .toc-list-item, #toc-wrapper .toc-list-item ul,
+#toc-popup-content ul, #toc-popup-content ul ul, #toc-popup-content ul li, #toc-popup-content li {
+  display: block !important;
+  overflow: visible !important;
+  max-height: none !important;
+  list-style-type: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+}
+
+/* Eliminate Chirpy default blue bars and pseudo-element indicators */
+#toc-wrapper ul li a::before,
+#toc-wrapper ul li a::after,
+#toc ul li a::before,
+#toc ul li a::after,
+.toc-link::before,
+.toc-link::after,
+.is-active-link::before,
+.is-active-link::after {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  content: none !important;
+}
+
+/* Base link styling: all border-left edges sit precisely on the outer vertical border line */
+#toc-wrapper ul li a,
+#toc ul li a,
+.toc-link {
+  display: block !important;
+  font-family: var(--font-family-sans-serif, "Source Sans Pro", sans-serif) !important;
+  font-size: 0.83rem !important;
+  font-weight: 500 !important;
+  line-height: 1.45 !important;
+  color: var(--portfolio-muted, #8d8e93) !important;
+  padding: 0.35rem 0.6rem 0.35rem 0.75rem !important;
+  margin: 0 !important;
+  border-left: 2px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 0 6px 6px 0 !important;
+  background: transparent !important;
+  transition: color 180ms ease, border-color 180ms ease, background-color 180ms ease !important;
+  text-decoration: none !important;
+  white-space: normal !important;
+  word-break: break-word !important;
+
+  &:hover {
+    color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+    border-left-color: rgba(255, 255, 255, 0.45) !important;
+  }
+}
+
+/* Indent ONLY the text label inside nested levels using padding-left so the outer border-left never jumps inward */
+#toc-wrapper ul li ul li a,
+#toc ul li ul li a,
+.toc-link.node-name--H2 {
+  padding-left: 1.25rem !important;
+}
+
+#toc-wrapper ul li ul li ul li a,
+#toc ul li ul li ul li a,
+.toc-link.node-name--H3 {
+  padding-left: 1.75rem !important;
+}
+
+#toc-wrapper ul li ul li ul li ul li a,
+#toc ul li ul li ul li ul li a,
+.toc-link.node-name--H4 {
+  padding-left: 2.25rem !important;
+}
+
+#toc-wrapper ul li a.is-active-link,
+#toc ul li a.is-active-link,
+.toc-link.is-active-link {
+  color: #ffffff !important;
+  font-weight: 500 !important;
+  border-left: 2px solid #ffffff !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
 }
 
