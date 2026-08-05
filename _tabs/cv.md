@@ -77,7 +77,14 @@ order: 4
         <details class="cv-exp-expand">
           <summary><i class="fas fa-chevron-down"></i> Expand for more details</summary>
           <div class="cv-exp-expand-content">
-            <!-- Add expanded content details here -->
+            <ul>
+              <li>Organized project end to end. Managed requirements both in documents and in development.</li>
+              <li>Explored & researched new technologies and frameworks to work with.</li>
+              <li>Implemented new state-of-the-art machine learning algorithms to the project; worked on signal collection both static and latent.</li>
+              <li>Improved its security and added fallback mechanisms for different purposes to the project.</li>
+              <li>In FLaction, worked on both backend and frontend development, implementing new features and enhancing Docker-based deployment infrastructure.</li>
+              <li>Signed an NDA; further details cannot be disclosed.</li>
+            </ul>
           </div>
         </details>
       </div>
@@ -95,7 +102,11 @@ order: 4
         <details class="cv-exp-expand">
           <summary><i class="fas fa-chevron-down"></i> Expand for more details</summary>
           <div class="cv-exp-expand-content">
-            <!-- Add expanded content details here -->
+            <ul>
+              <li>Make the code and results more readable and maintainable with SOLID principles, also adding dynamic settings and more clear metrics.</li>
+              <li>Implemented new Features and Feature Selection, expanding its pipeline and sources.</li>
+              <li>Wrote read/compare blockchain scripts with Solidity and deployed it; automated its query with Python.</li>
+            </ul>
           </div>
         </details>
       </div>
@@ -112,7 +123,9 @@ order: 4
         <details class="cv-exp-expand">
           <summary><i class="fas fa-chevron-down"></i> Expand for more details</summary>
           <div class="cv-exp-expand-content">
-            <!-- Add expanded content details here -->
+            <ul>
+              <li>Helped with the deployment of IT processes, including inventory management, troubleshooting, and connecting security cameras and IoT devices to the server.</li>
+            </ul>
           </div>
         </details>
       </div>
