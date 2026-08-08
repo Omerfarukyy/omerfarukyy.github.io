@@ -4,16 +4,15 @@
 -->
 
 {% capture result_elem %}
-  <article class="work-card work-card--default work-card--search-item">
-    <a class="work-card__cover-link" href="{url}" aria-label="{title}"></a>
+  <article class="work-card work-card--{kind} work-card--search-item">
     {media}
     <div class="work-card__body">
       <span class="work-card__label">{label}</span>
-      <h3>{title}</h3>
+      <h3><a href="{url}">{title}</a></h3>
       <p>{summary}</p>
       {tags_html}
     </div>
-    {repo_html}
+    {actions_html}
   </article>
 {% endcapture %}
 

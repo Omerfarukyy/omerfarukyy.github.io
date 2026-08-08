@@ -1083,6 +1083,14 @@ body:has(.home-hub) #search-trigger {
     box-shadow: none;
   }
 
+  /* Search-item cards: suppress translateY/box-shadow hover (they use inline title links, not cover-link overlay) */
+  .work-card--search-item:hover,
+  .work-card--search-item:focus-within {
+    transform: none;
+    box-shadow: none;
+    border-color: var(--portfolio-line-strong);
+  }
+
   .work-card:hover img {
     transform: scale(1.025);
   }
@@ -1154,6 +1162,74 @@ body:has(.home-hub) #search-trigger {
   .home-side-grid {
     grid-column: auto;
     grid-template-rows: auto;
+  }
+
+  /* ── Mobile-friendly labels, cards, and sections ── */
+
+  .eyebrow,
+  .work-card__label,
+  .home-area__meta {
+    font-size: 0.6rem;
+    letter-spacing: 0.06em;
+  }
+
+  .work-card__body {
+    padding: 0.7rem 0.75rem 0.8rem;
+  }
+
+  .work-card h3 {
+    font-size: 0.95rem;
+    margin: 0.2rem 0 0.35rem;
+  }
+
+  .work-card p {
+    font-size: 0.78rem;
+    -webkit-line-clamp: 2;
+  }
+
+  .work-card__actions {
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0 0.75rem 0.85rem;
+  }
+
+  .work-card__btn {
+    font-size: 0.68rem;
+    padding: 0.45rem 0.5rem;
+  }
+
+  .work-card__tags {
+    gap: 0.25rem;
+    padding-top: 0.45rem;
+  }
+
+  .work-card__tags span {
+    font-size: 0.55rem;
+    padding: 0.1rem 0.35rem;
+  }
+
+  .work-section__heading {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
+  }
+
+  .work-section__heading > span {
+    font-size: 0.68rem;
+  }
+
+  .page-intro p {
+    font-size: 0.92rem;
+  }
+
+  .work-card__visual {
+    aspect-ratio: 16 / 8;
+    padding: 0.6rem;
+  }
+
+  .work-card__media {
+    aspect-ratio: 16 / 8;
+    padding: 0.5rem;
   }
 }
 
@@ -1561,6 +1637,52 @@ body:has(.home-hub) #search-trigger {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+/* Search-item card: shield buttons & links from Chirpy .content / #search-results link overrides */
+#search-results .work-card__btn,
+#search-results .work-card__btn:hover,
+#search-results .work-card__btn:focus,
+.content .work-card__btn,
+.content .work-card__btn:hover,
+.content .work-card__btn:focus {
+  color: var(--portfolio-ink) !important;
+  background: var(--portfolio-surface-raised) !important;
+  border: 1px solid var(--portfolio-line) !important;
+  border-bottom: 1px solid var(--portfolio-line) !important;
+  text-decoration: none !important;
+  font-family: var(--font-family-monospace) !important;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+}
+
+#search-results .work-card__btn:hover,
+.content .work-card__btn:hover {
+  border-color: var(--portfolio-line-strong) !important;
+  box-shadow: 0 8px 20px rgb(0 0 0 / 28%) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Search-item card: title link styling — override Chirpy border-bottom & color */
+#search-results .work-card--search-item h3 a,
+.content .work-card--search-item h3 a {
+  color: inherit !important;
+  text-decoration: none !important;
+  border-bottom: none !important;
+  transition: color 180ms ease;
+}
+
+#search-results .work-card--search-item h3 a:hover,
+.content .work-card--search-item h3 a:hover {
+  color: var(--portfolio-ink) !important;
+  text-decoration: underline !important;
+  text-underline-offset: 2px;
+  border-bottom: none !important;
+}
+
+/* Search-item project cards: suppress cover-link transform, let actions handle clicks */
+.work-card--search-item.work-card--project {
+  cursor: default;
+}
+
 /* Empty State & Hints inside Search */
 .search-empty-state,
 #search-results > p,
@@ -1749,19 +1871,24 @@ body:has(.home-hub) #search-trigger {
   #search-results article.work-card {
     background: var(--portfolio-surface) !important;
     border: 1px solid var(--portfolio-line) !important;
-    transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease !important;
+    transition: border-color 180ms ease, box-shadow 180ms ease !important;
 
     &:hover,
     &:focus-within {
-      border-color: #ffffff !important;
-      transform: translateY(-3px) !important;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4), 0 0 12px rgba(255, 255, 255, 0.15) !important;
+      border-color: var(--portfolio-line-strong) !important;
+      transform: none !important;
+      box-shadow: none !important;
 
       h3, p, span, .work-card__label, .work-card__tags span {
         color: #ffffff !important;
         border-color: rgba(255, 255, 255, 0.3) !important;
       }
     }
+  }
+
+  /* Search-item title link in dark mode */
+  .work-card--search-item h3 a:hover {
+    color: #ffffff !important;
   }
 }
 

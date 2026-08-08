@@ -7,8 +7,10 @@ swcache: true
   {% for post in site.posts %}
   {% assign summary = post.description | default: post.excerpt | strip_html | strip_newlines | truncate: 140 %}
   {% assign label = 'Article' %}
+  {% assign kind = 'default' %}
   {% if post.categories contains 'Projects' or post.categories contains 'projects' %}
     {% assign label = 'Project' %}
+    {% assign kind = 'project' %}
   {% elsif post.categories contains 'Writeups' or post.categories contains 'writeups' %}
     {% assign label = 'Writeup' %}
   {% elsif post.categories contains 'Security Research' or post.categories contains 'research' %}
@@ -36,9 +38,14 @@ swcache: true
     {% endif %}
   {% endcapture %}
 
-  {% capture repo_html %}
-    {% if post.repo_url %}
-      <a class="work-card__repo" href="{{ post.repo_url }}" target="_blank" rel="noopener noreferrer">GitHub <i class="fab fa-github" aria-hidden="true"></i></a>
+  {% capture actions_html %}
+    {% if kind == 'project' %}
+      <div class="work-card__actions">
+        {% if post.repo_url %}
+          <a class="work-card__btn" href="{{ post.repo_url }}" target="_blank" rel="noopener noreferrer">GitHub <i class="fab fa-github" aria-hidden="true"></i></a>
+        {% endif %}
+        <a class="work-card__btn work-card__btn--details" href="{{ post.url | relative_url }}">Details <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+      </div>
     {% endif %}
   {% endcapture %}
 
@@ -49,10 +56,11 @@ swcache: true
     "tags": {{ post.tags | join: ', ' | jsonify }},
     "date": {{ post.date | jsonify }},
     "label": {{ label | jsonify }},
+    "kind": {{ kind | jsonify }},
     "summary": {{ summary | jsonify }},
     "media": {{ media_html | strip_newlines | jsonify }},
     "tags_html": {{ tags_html | strip_newlines | jsonify }},
-    "repo_html": {{ repo_html | strip_newlines | jsonify }},
+    "actions_html": {{ actions_html | strip_newlines | jsonify }},
     {% capture content -%}{% include post-summary.html full_text=true %}{%- endcapture -%}
     "content": {{ content | jsonify }}
   }{% unless forloop.last %},{% endunless %}
