@@ -8,7 +8,7 @@ order: 4
   <div class="cv-top-bar">
     {% if site.cv.pdf_url %}
       <a class="action-link action-link--primary" href="{{ site.cv.pdf_url | relative_url }}" download>
-        <i class="fas fa-file-pdf"></i> Download CV <span>PDF</span>
+        <i class="fas fa-file-pdf"></i> Download CV (PDF)
       </a>
     {% endif %}
   </div>
