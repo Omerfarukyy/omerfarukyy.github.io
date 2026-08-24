@@ -24,7 +24,7 @@ order: 4
         </div>
         <div class="cv-contact-row">
           <a href="https://github.com/Omerfarukyy" target="_blank" rel="noopener"><i class="fab fa-github"></i> https://github.com/Omerfarukyy</a>
-          <a href="https://linkedin.com/in/ömer-faruk-yılmaz" target="_blank" rel="noopener"><i class="fab fa-linkedin"></i> linkedin.com/in/ömer-faruk-yılmaz</a>
+          <a href="https://www.linkedin.com/in/omerfrkyilmaz" target="_blank" rel="noopener"><i class="fab fa-linkedin"></i> linkedin.com/in/omerfrkyilmaz</a>
         </div>
       </div>
     </header>

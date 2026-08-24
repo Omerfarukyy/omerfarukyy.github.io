@@ -337,16 +337,21 @@
 
 .action-link:hover,
 .action-link:focus-visible {
-  border-color: #ffffff !important;
-  box-shadow: 0 0 5px rgba(255, 255, 255, 0.2), 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+  border-color: var(--portfolio-line-strong);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   transform: translateY(-2px);
-  color: #ffffff !important;
 }
 
 .action-link--primary {
   border-color: var(--portfolio-line-strong);
   background: var(--portfolio-ink);
   color: var(--portfolio-ink-inverse);
+}
+
+.action-link--primary:hover,
+.action-link--primary:focus-visible {
+  color: var(--portfolio-ink-inverse) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
 .page-intro {
