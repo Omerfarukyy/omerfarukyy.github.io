@@ -113,7 +113,7 @@ order: 4
 
       <div class="cv-exp-item">
         <div class="cv-item-header">
-          <h3>IT Support Intern - Istanbul Aydın University</h3>
+          <h3>IT Support Intern - Istanbul Aydín University</h3>
           <span class="cv-date">September 2024 - June 2025 (9m)</span>
         </div>
         <ul>
