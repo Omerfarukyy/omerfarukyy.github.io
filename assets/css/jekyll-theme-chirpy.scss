@@ -1025,9 +1025,11 @@ body:has(.cv-page, .category-view-more-page) #tail-wrapper {
   color: var(--sidebar-muted-color);
 }
 
-body:has(.home-hub) #search,
-body:has(.home-hub) #search-trigger {
-  display: none !important;
+@media (min-width: 992px) {
+  body:has(.home-hub) #search,
+  body:has(.home-hub) #search-trigger {
+    display: none !important;
+  }
 }
 
 @media (min-width: 992px) {
@@ -1050,6 +1052,112 @@ body:has(.home-hub) #search-trigger {
     font-weight: 700;
     letter-spacing: 0.1em;
     text-transform: uppercase;
+  }
+}
+
+/* Mobile Topbar: Symmetrical Centered Title */
+@media (max-width: 991.98px) {
+  /* Center the title absolutely so it's perfectly symmetrical */
+  #topbar-title {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    max-width: calc(100% - 120px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  /* Ensure topbar is positioned for absolute child */
+  #topbar-wrapper #topbar {
+    position: relative;
+  }
+
+  /* Shorten the search bar on mobile */
+  #topbar search#search {
+    max-width: 75%;
+  }
+
+  /* Cancel button: plain text label, centered in remaining space */
+  #search-cancel.d-block {
+    font-family: var(--font-family-monospace) !important;
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    color: var(--portfolio-muted) !important;
+    border: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 1;
+    transition: color 150ms ease !important;
+    box-shadow: none !important;
+  }
+
+  #search-cancel.d-block:hover,
+  #search-cancel.d-block:active {
+    color: var(--portfolio-ink) !important;
+  }
+}
+
+/* Search Hints (Trending Tags) — match site tag pill style */
+#search-hints .panel-heading {
+  font-family: var(--font-family-monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--portfolio-muted);
+  margin-bottom: 0.6rem;
+}
+
+#search-hints .post-tag {
+  font-family: var(--font-family-monospace) !important;
+  font-size: 0.72rem !important;
+  font-weight: 600 !important;
+  border: 1px solid var(--portfolio-line) !important;
+  background: var(--portfolio-surface-raised) !important;
+  color: var(--portfolio-muted) !important;
+  border-radius: 4px !important;
+  padding: 0.22rem 0.55rem !important;
+  margin: 0.2rem 0.25rem 0.25rem 0 !important;
+  line-height: 1.3 !important;
+  text-decoration: none !important;
+  box-shadow: none !important;
+  display: inline-block !important;
+  transition: border-color 150ms ease, color 150ms ease, transform 150ms ease, background-color 150ms ease !important;
+}
+
+#search-hints .post-tag:hover,
+#search-hints .post-tag:focus {
+  border-color: var(--portfolio-line-strong) !important;
+  color: var(--portfolio-ink) !important;
+  background: var(--portfolio-surface) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* Mobile: bigger trending tags for easier tapping */
+@media (max-width: 991.98px) {
+  #search-hints .panel-heading {
+    font-size: 0.85rem;
+    margin-bottom: 0.8rem;
+    margin-top: 0.5rem;
+  }
+
+  #search-hints .post-tag {
+    font-size: 0.85rem !important;
+    padding: 0.5rem 0.85rem !important;
+    margin: 0.3rem 0.35rem 0.35rem 0 !important;
+    border-radius: 6px !important;
+    min-height: 2.4rem;
+    display: inline-flex !important;
+    align-items: center !important;
   }
 }
 
@@ -1588,6 +1696,13 @@ body:has(.home-hub) #search-trigger {
   transition: border-color 180ms ease, box-shadow 180ms ease;
   display: flex;
   align-items: center;
+}
+
+/* Mobile: hide inline search bar by default; JS adds .d-flex to show it */
+@media (max-width: 991.98px) {
+  #topbar search#search:not(.d-flex) {
+    display: none !important;
+  }
 }
 
 #topbar search#search:hover,
